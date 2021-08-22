@@ -46,7 +46,8 @@ class HtmlEditor extends StatefulWidget {
   _HtmlEditorState createState() => _HtmlEditorState();
 }
 
-class _HtmlEditorState extends State<HtmlEditor> with AutomaticKeepAliveClientMixin {
+class _HtmlEditorState extends State<HtmlEditor>
+    with AutomaticKeepAliveClientMixin {
   late String htmlData;
   late double _height;
   late ContextMenu _contextMenu;
@@ -324,7 +325,8 @@ class _HtmlEditorState extends State<HtmlEditor> with AutomaticKeepAliveClientMi
       setState(() {
         _height = max(contentHeight, 200);
       });
-      if (widget.controller.scrollController != null && widget.autoAdjustScroll) {
+      if (widget.controller.scrollController != null &&
+          widget.autoAdjustScroll) {
         ScrollController controller = widget.controller.scrollController!;
         if (controller.position.maxScrollExtent > 0) {
           WidgetsBinding.instance?.addPostFrameCallback((_) {
