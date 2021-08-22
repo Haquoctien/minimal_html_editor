@@ -1,5 +1,5 @@
 # General
-Minimal HTML WYSIWYG editor with **only context menu formatting options** (for now), support flexible height, customize placeholder, intial text, background color, and common textfield callbacks and methods. 
+[Minimal HTML WYSIWYG editor](https://pub.dev/packages/minimal_html_editor) with **only context menu formatting options** (for now), support flexible height, customize placeholder, intial text, background color, and common textfield callbacks and methods. 
 
 Only backbone html, css and js underneath, no libary, no jQuery. Extremely lightweight.
 
