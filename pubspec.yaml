@@ -1,6 +1,6 @@
 name: minimal_html_editor
 description: Minimal html wysiwyg editor with only context menu formatting options, support flexible height, customize placeholder, intial text, background color, and common textfield callbacks like onFocus, onBlur, onChanged.
-version: 0.0.3+1
+version: 1.0.0
 repository: https://github.com/Haquoctien/minimal_html_editor
 
 environment:

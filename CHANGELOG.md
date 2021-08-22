@@ -17,3 +17,5 @@
 
 * Add README
 * Some refactoring
+
+## 1.0.0
