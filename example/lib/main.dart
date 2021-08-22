@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:minimal_html_editor/minimal_html_editor.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 
@@ -27,18 +29,48 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
+  final _scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Minimal Html Editor demo"),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[],
+      body: Scaffold(
+        appBar: AppBar(
+          title: Text("Minimal Html Editor demo"),
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          items: [
+            BottomNavigationBarItem(
+              label: "One",
+              icon: Icon(Icons.ac_unit),
+            ),
+            BottomNavigationBarItem(
+              label: "Two",
+              icon: Icon(Icons.access_alarm),
+            )
+          ],
+        ),
+        body: Center(
+          child: ListView(
+            controller: _scrollController,
+            children: <Widget>[
+              Center(
+                  child: Text(
+                "Hello world",
+                style: TextStyle(fontSize: 20),
+              )),
+              HtmlEditor(
+                flexibleHeight: true,
+                minHeight: 150,
+                autoAdjustScroll: true,
+                scrollController: _scrollController,
+              ),
+              Center(
+                  child: Text(
+                "Chào thế giới",
+                style: TextStyle(fontSize: 20),
+              )),
+            ],
+          ),
         ),
       ),
     );
