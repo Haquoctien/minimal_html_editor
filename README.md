@@ -1,4 +1,4 @@
-# hello
+# Minimal Html Editor
 
 A new Flutter package project.
 
