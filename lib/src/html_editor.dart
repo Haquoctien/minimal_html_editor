@@ -11,8 +11,8 @@ import 'package:minimal_html_editor/src/editor_controller.dart';
 class HtmlEditor extends StatefulWidget {
   /// Controller for controlling underlying webview and parent's scroll controller.
   ///
-  /// This exposes the [getHtml], [setHtml], [focus], [unfocus]
-  /// methods for this editor.
+  /// This exposes the [EditorController.getHtml],[EditorController.setHtml], [EditorController.focus],
+  /// [EditorController.unfocus] and [EditorController.webViewController] methods for this editor.
   late final EditorController controller;
 
   /// Call when editor contents change.
@@ -34,7 +34,7 @@ class HtmlEditor extends StatefulWidget {
 
   /// Minimum initial height for editor.
   ///
-  /// This will be the height of this widget if [flexibleHeight]:`false`.
+  /// This will be the height of this widget if [flexibleHeight] is `false`.
   /// Otherwise it will be the initial height and the widget will grow
   /// or shrink to accomodate content height, but never shrinks below this value.
   ///
@@ -43,8 +43,8 @@ class HtmlEditor extends StatefulWidget {
 
   /// Adjust scroll so new lines don't go below keyboard.
   ///
-  /// Not needed for [flexibleHeight]:`false`.
-  /// If `true`, [controller.scrollController] must not be `null`.
+  /// Not needed for [flexibleHeight] is `false`.
+  /// If `true`, [EditorController.scrollController] must not be `null`.
   ///
   /// Default to `false`.
   final bool autoAdjustScroll;
@@ -57,13 +57,20 @@ class HtmlEditor extends StatefulWidget {
   /// Default to `#ffffff`, which is white.
   final String backgroundColorCssCode;
 
+  /// Padding for editor
+  ///
+  /// Default to [EdgeInsets.zero]
+  final EdgeInsets padding;
+
   /// Placeholder (hint) for editor.
   ///
   /// Default to `Edit text`.
   final String placeholder;
 
-  /// Initial html text for editor.
+  /// Initial text for editor.
   ///
+  /// Has to be plain text in order to not mess up editor layout.
+  /// Will be wrapped in `<p></p>`.
   /// Replaces `<p><br></p>` as the initial html content.
   final String? initialText;
 
@@ -72,14 +79,21 @@ class HtmlEditor extends StatefulWidget {
   /// Default to `false`.
   final bool printWebViewLog;
 
+  /// Page title for web view.
+  ///
+  /// Can be used by screen reader as label for webview.
+  final String webViewTitle;
+
+  /// Enable Android hybrid composition.
+  ///
+  /// NOTE: It is recommended to use Hybrid Composition only on Android 10+ for a release app, as it can cause framerate drops on animations in Android 9 and lower.
+  /// Default to `false`.
+  final bool useAndroidHybridComposition;
+
   /// Creates a [HtmlEditor].
   ///
   /// No paramameters are `required`. But if [autoAdjustScroll] is `true`,
-  /// then [controller.scrollController] must not be `null`.
-
-  /// Page title for web view.
-  final String webViewTitle;
-
+  /// then [EditorController.scrollController] must not be `null`.
   HtmlEditor({
     Key? key,
     EditorController? controller,
@@ -87,6 +101,7 @@ class HtmlEditor extends StatefulWidget {
     this.onFocus,
     this.onBlur,
     this.minHeight = 300.0,
+    this.padding = EdgeInsets.zero,
     this.autoAdjustScroll = false,
     this.flexibleHeight = false,
     this.backgroundColorCssCode = "#ffffff",
@@ -94,6 +109,7 @@ class HtmlEditor extends StatefulWidget {
     this.initialText,
     this.printWebViewLog = false,
     this.webViewTitle = "Editor",
+    this.useAndroidHybridComposition = false,
   }) : super(key: key) {
     if (controller == null) {
       this.controller = EditorController();
@@ -140,9 +156,10 @@ class _HtmlEditorState extends State<HtmlEditor>
       background-color: ${widget.backgroundColorCssCode} !important;
       font-family: sans-serif;
       margin: 0px;
-      padding-left: 10px;
-      padding-right: 10px;
-      padding-bottom: 10px;
+      padding-top: ${widget.padding.top}px;
+      padding-left: ${widget.padding.left}px;
+      padding-right: ${widget.padding.right}px;
+      padding-bottom: ${widget.padding.bottom}px;
     }
 
     #editor {
@@ -263,6 +280,7 @@ class _HtmlEditorState extends State<HtmlEditor>
                   geolocationEnabled: false,
                   builtInZoomControls: false,
                   thirdPartyCookiesEnabled: false,
+                  useHybridComposition: widget.useAndroidHybridComposition,
                 )),
             contextMenu: _contextMenu,
             onConsoleMessage: widget.printWebViewLog

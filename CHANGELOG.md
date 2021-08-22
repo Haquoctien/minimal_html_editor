@@ -30,3 +30,7 @@
 
 ## 1.1.0
 * Auto adjust height for flexible editor on set html.
+
+## 1.1.1
+* Edit README
+* Add custom padding and make useAndroidHybridComposition optional

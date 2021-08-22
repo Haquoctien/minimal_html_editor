@@ -10,11 +10,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      title: 'Minimal Html Editor',
+      home: MyHomePage(title: 'Demo'),
     );
   }
 }
@@ -48,89 +45,63 @@ class _MyHomePageState extends State<MyHomePage> {
             title: Text("Minimal Html Editor demo"),
             bottom: TabBar(
               tabs: [
-                Text("Flexible"),
-                Text("Fixed and scrollable"),
+                Text("Flexible height, magenta background"),
+                Text("Fixed height and scrollable"),
               ],
             ),
           ),
-          bottomNavigationBar: BottomNavigationBar(
-            items: [
-              BottomNavigationBarItem(
-                label: "Log content ",
-                icon: IconButton(
-                  icon: Icon(Icons.pages),
-                  onPressed: () async => print(
-                    await _editorController.getHtml(),
-                  ),
-                ),
-              ),
-              BottomNavigationBarItem(
-                label: "Focus",
-                icon: IconButton(
-                  icon: Icon(Icons.edit_attributes_sharp),
-                  onPressed: () => _editorController.focus(),
-                ),
-              ),
-              BottomNavigationBarItem(
-                label: "Blur",
-                icon: IconButton(
-                  icon: Icon(Icons.edit_attributes_sharp),
-                  onPressed: () => _editorController.unfocus(),
-                ),
-              ),
-            ],
-          ),
           body: TabBarView(
             children: [
-              ListView(
+              SingleChildScrollView(
                 controller: _scrollController,
-                children: <Widget>[
-                  Center(
-                    child: Text(
-                      "Hello world",
-                      style: TextStyle(fontSize: 20),
+                child: Column(
+                  children: <Widget>[
+                    Center(
+                      child: Text(
+                        "Flexible height, magenta background",
+                        style: TextStyle(fontSize: 20),
+                      ),
                     ),
-                  ),
-                  HtmlEditor(
-                    flexibleHeight: true,
-                    autoAdjustScroll: true,
-                    controller: _editorController,
-                    minHeight: 150,
-                    backgroundColorCssCode: "magenta",
-                    initialText: "Hi there",
-                    placeholder: "Placeholder for flexible height",
-                    printWebViewLog: true,
-                    onChange: (content, height) => print(content),
-                  ),
-                  Center(
-                    child: Text(
-                      "Chào thế giới",
-                      style: TextStyle(fontSize: 20),
+                    HtmlEditor(
+                      flexibleHeight: true,
+                      autoAdjustScroll: true,
+                      controller: _editorController,
+                      minHeight: 150,
+                      padding: EdgeInsets.all(20),
+                      backgroundColorCssCode: "magenta",
+                      initialText: "Some initial text",
+                      placeholder: "Chào thế giới",
+                      printWebViewLog: true,
+                      useAndroidHybridComposition: true,
+                      onChange: (content, height) => print(content),
                     ),
-                  ),
-                ],
+                    Center(
+                      child: Text(
+                        "Flexible height, magenta background",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               SingleChildScrollView(
                 child: Column(
                   children: <Widget>[
                     Center(
                       child: Text(
-                        "Hello world",
+                        "Fixed height and scrollable",
                         style: TextStyle(fontSize: 20),
                       ),
                     ),
                     HtmlEditor(
                       backgroundColorCssCode: "#fafafa",
                       minHeight: 250,
-                      initialText: r"""<p>I am normal</p>
-                        <p style="color:red;">I am red</p>
-                        <p style="color:blue;">I am blue</p>
-                        <p style="font-size:50px;">I am big</p>""",
-                      placeholder: "Placeholder for fixed height",
+                      initialText: "Some initial text",
+                      placeholder: "Chào thế giới",
                     ),
                     Center(
                       child: Text(
-                        "Chào thế giới",
+                        "Fixed height and scrollable",
                         style: TextStyle(fontSize: 20),
                       ),
                     ),
