@@ -1,14 +1,52 @@
-# Minimal Html Editor
+# General
+Minimal HTML WYSIWYG editor with **only context menu formatting options**, support flexible height, customize placeholder, intial text, background color, and common textfield callbacks and methods. 
 
-A new Flutter package project.
+Only backbone html, css and js underneath, no libary, no jQuery.
 
-## Getting Started
-
-This project is a starting point for a Dart
-[package](https://flutter.dev/developing-packages/),
-a library module containing code that can be shared easily across
-multiple Flutter or Dart projects.
-
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.dev/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+Works great with screen reader.
+# How to use
+## Minimal example
+No constructor fields are required, just insert this into your widget tree:
+```dart
+HtmlEditor(),
+```
+## Simple example
+Editor with fixed height, custom placeholder and initial content, gray background and onChange callback to update something:
+```dart
+HtmlEditor(
+	backgroundColorCssCode: "gray",
+	minHeight: 300,
+	initialText: "<p>Some initial text</p>",
+	placeholder: "Edit me",
+	onChange: (content, height) => update(content),
+),
+```
+## Full feature example
+Editor with custom appearance, flexible height, auto scrolling to avoid texts going below keyboard while editing, custom web view title for screen reader and callbacks actions.
+```dart
+ListView(
+  controller: scrollController,
+	children: [
+		...,
+		HtmlEditor(
+			backgroundColorCssCode: "#555555",
+			minHeight: 300,
+			flexibleHeight: true,
+			autoAdjustScroll: true,
+			// Alternatively, make a variable for this to gain access to the web controller and the editor methods
+			controller: EditorController(
+				scrollController: scrollController,
+			),
+			initialText: "Some initial text",
+			placeholder: "Edit me",
+			onChange: (content, height) => update(content),
+			onFocus: () => doSomething(),
+			onBlur: () => doSomeOtherThing(),
+			printWebViewLog: true,
+			webViewTitle: "Editor",
+		),
+		...,
+	],
+),
+```
+Check out Example and API for more.
