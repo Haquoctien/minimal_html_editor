@@ -97,8 +97,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     controller: _editorController,
                     minHeight: 150,
                     backgroundColorCssCode: "magenta",
+                    initialText: "Hi there",
                     placeholder: "Placeholder for flexible height",
                     printWebViewLog: true,
+                    onChange: (content, height) => print(content),
                   ),
                   Center(
                     child: Text(
@@ -121,9 +123,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       backgroundColorCssCode: "#fafafa",
                       minHeight: 250,
                       initialText: r"""<p>I am normal</p>
-                      <p style="color:red;">I am red</p>
-                      <p style="color:blue;">I am blue</p>
-                      <p style="font-size:50px;">I am big</p>""",
+                        <p style="color:red;">I am red</p>
+                        <p style="color:blue;">I am blue</p>
+                        <p style="font-size:50px;">I am big</p>""",
                       placeholder: "Placeholder for fixed height",
                     ),
                     Center(

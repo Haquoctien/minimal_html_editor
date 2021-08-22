@@ -21,10 +21,10 @@ class HtmlEditor extends StatefulWidget {
   /// [height] is the current content height, including scrollheight.
   final Function(String content, double height)? onChange;
 
-  /// Call when editor gains focus
+  /// Call when editor gains focus.
   final Function()? onFocus;
 
-  /// Call when editor loses focus
+  /// Call when editor loses focus.
   final Function()? onBlur;
 
   /// Whether widget will be flexible in height with respect to content.
@@ -62,10 +62,12 @@ class HtmlEditor extends StatefulWidget {
   /// Default to `Edit text`.
   final String placeholder;
 
-  /// Initial text for editor
+  /// Initial html text for editor.
+  ///
+  /// Replaces `<p><br></p>` as the initial html content.
   final String? initialText;
 
-  /// Whether to print webview console logs to debugger
+  /// Whether to print webview console logs to debugger.
   ///
   /// Default to `false`.
   final bool printWebViewLog;
@@ -74,9 +76,13 @@ class HtmlEditor extends StatefulWidget {
   ///
   /// No paramameters are `required`. But if [autoAdjustScroll] is `true`,
   /// then [controller.scrollController] must not be `null`.
+
+  /// Page title for web view.
+  final String webViewTitle;
+
   HtmlEditor({
     Key? key,
-    controller,
+    EditorController? controller,
     this.onChange,
     this.onFocus,
     this.onBlur,
@@ -87,6 +93,7 @@ class HtmlEditor extends StatefulWidget {
     this.placeholder = "Edit text",
     this.initialText,
     this.printWebViewLog = false,
+    this.webViewTitle = "Editor",
   }) : super(key: key) {
     if (controller == null) {
       this.controller = EditorController();
@@ -120,7 +127,7 @@ class _HtmlEditorState extends State<HtmlEditor>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=yes">
-    <title>Din besked</title>
+    <title>${widget.webViewTitle}</title>
 </head>
 <style>
     [contenteditable]:focus {
@@ -358,7 +365,7 @@ class _HtmlEditorState extends State<HtmlEditor>
               widget.controller.setWebViewController(controller);
               _isInitializedCompleter.complete(true);
               if (widget.initialText != null) {
-                widget.controller.setHtml(widget.initialText!);
+                widget.controller.setHtml('<p>${widget.initialText!}</p>');
               }
             },
           ),
