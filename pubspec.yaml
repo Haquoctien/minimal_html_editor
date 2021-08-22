@@ -1,7 +1,7 @@
 name: minimal_html_editor
 description: A new Flutter package project.
 version: 0.0.1
-publish_to: pub.dev
+repository: https://github.com/Haquoctien/minimal_html_editor
 
 environment:
   sdk: '>=2.12.0 <3.0.0'
