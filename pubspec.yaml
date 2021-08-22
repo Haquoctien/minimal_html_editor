@@ -20,11 +20,7 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter.
-flutter:
-  # To add assets to your package, add an assets section, like this:
-  assets:
-    - lib/assets/editor.html
-    - lib/assets/initialize.js
+
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   #

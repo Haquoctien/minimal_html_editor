@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 // ignore: must_be_immutable
+
 class HtmlEditor extends StatefulWidget {
   HtmlEditor({
     Key? key,
@@ -55,7 +56,7 @@ class _HtmlEditorState extends State<HtmlEditor> {
     }
 
     body {
-      height: ${widget.flexibleHeight ? 'auto' : '${widget.minHeight}px'} !important;
+      height: auto !important;
       overflow: ${widget.flexibleHeight ? 'hidden' : 'scroll'} !important;
       background-color: ${widget.backgroundColorCssCode} !important;
       font-family: sans-serif;
@@ -67,8 +68,8 @@ class _HtmlEditorState extends State<HtmlEditor> {
 
     #editor {
         margin-top: -10px;
-        height: inherit;
-        overflow: inherit;
+        height: auto !important;
+        overflow: ${widget.flexibleHeight ? 'hidden' : 'scroll'} !important;
         position: relative;
         word-wrap: break-word
     }
@@ -147,9 +148,9 @@ class _HtmlEditorState extends State<HtmlEditor> {
             crossPlatform: InAppWebViewOptions(
               javaScriptEnabled: true,
               transparentBackground: true,
-              disableHorizontalScroll: widget.flexibleHeight,
+              disableHorizontalScroll: true,
               disableVerticalScroll: widget.flexibleHeight,
-              horizontalScrollBarEnabled: !widget.flexibleHeight,
+              horizontalScrollBarEnabled: false,
               verticalScrollBarEnabled: !widget.flexibleHeight,
               supportZoom: false,
             ),
@@ -176,12 +177,61 @@ class _HtmlEditorState extends State<HtmlEditor> {
         onLoadStop: (controller, _) {
           // set up editor and add callbacks
           _controller = controller;
-          _controller.injectJavascriptFileFromAsset(assetFilePath: "assets/initialize.js");
           _controller.evaluateJavascript(source: """
+          // initialize 
+          var editor = document.getElementById("editor");
+          editor.innerHTML = "<p><br></p>";
           var placeholder = document.createElement("div");
           placeholder.innerHTML = "<p>${widget.placeholder}</p>";
           placeholder.id = "placeholder";
           document.getElementById("editor-container").prepend(placeholder);
+          // block delete input to keep default content
+          editor.addEventListener("keydown", event => {
+              var key = event.key || event.code || event.keyCode.toString;
+              if ((key === "Backspace" || key === "8" || key === "46") && editor.innerHTML === '<p><br></p>') {
+                  event.preventDefault();
+              }
+          });
+
+          // clean intput on paste so layout is not messed up
+          editor.addEventListener('paste', event => {
+              event.preventDefault();
+              var text = event.clipboardData.getData("text/plain");
+              console.log(text);
+              document.execCommand("insertHTML", false, text);
+          }, false);
+
+          // focus callback
+          editor.addEventListener('focus', (event) => {
+              console.log("Editor focused");
+              window.flutter_inappwebview.callHandler("onFocus");
+          });
+
+          document.getElementById("body").addEventListener('scroll', (event) => {
+              console.log("Scroll!");
+              event.preventDefault();
+          });
+
+          // blur callback
+          editor.addEventListener('blur', (event) => {
+              console.log("Editor unfocused");
+              window.flutter_inappwebview.callHandler("onBlur");
+          });
+
+          // onChange callback
+          editor.addEventListener("input", (event) => {
+              var content = editor.innerHTML;
+              var height = editor.scrollHeight;
+              if (content != '<p><br></p>') {
+                  placeholder.remove();
+              }
+              else {
+                  document.getElementById("editor-container").prepend(placeholder);
+              }
+              console.log("Text:" + editor.innerHTML);
+              console.log("Flexible height:" + height);
+              window.flutter_inappwebview.callHandler("onChange", content, height);
+          }, false);
           """);
           // add handlers
           controller.addJavaScriptHandler(
@@ -204,7 +254,9 @@ class _HtmlEditorState extends State<HtmlEditor> {
               callback: (args) {
                 String content = args[0];
                 int height = args[1];
-                adjustEditorHeight(contentHeight: height.toDouble());
+                if (widget.flexibleHeight) {
+                  adjustEditorHeight(contentHeight: height.toDouble());
+                }
                 widget.onChange?.call(content, height.toDouble());
               });
         },
