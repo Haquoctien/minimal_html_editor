@@ -9,18 +9,71 @@ import 'package:minimal_html_editor/src/editor_controller.dart';
 // ignore: must_be_immutable
 
 class HtmlEditor extends StatefulWidget {
+  /// Controller for controlling underlying webview and parent's scroll controller.
+  ///
+  /// This exposes the [getHtml], [setHtml], [focus], [unfocus]
+  /// methods for this editor.
   late final EditorController controller;
+
+  /// Call when editor contents change.
+  ///
+  /// [content] is the current content.
+  /// [height] is the current content height, including scrollheight.
   final Function(String content, double height)? onChange;
+
+  /// Call when editor gains focus
   final Function()? onFocus;
+
+  /// Call when editor loses focus
   final Function()? onBlur;
-  final double minHeight;
-  final bool autoAdjustScroll;
+
+  /// Whether widget will be flexible in height with respect to content.
+  ///
+  /// Default to `false`.
   final bool flexibleHeight;
+
+  /// Minimum initial height for editor.
+  ///
+  /// This will be the height of this widget if [flexibleHeight]:`false`.
+  /// Otherwise it will be the initial height and the widget will grow
+  /// or shrink to accomodate content height, but never shrinks below this value.
+  ///
+  /// Default to `300.0`.
+  final double minHeight;
+
+  /// Adjust scroll so new lines don't go below keyboard.
+  ///
+  /// Not needed for [flexibleHeight]:`false`.
+  /// If `true`, [controller.scrollController] must not be `null`.
+  ///
+  /// Default to `false`.
+  final bool autoAdjustScroll;
+
+  /// Background color for editor in css.
+  ///
+  /// This will be injected into the editor's css stylesheet.
+  /// See `https://www.w3schools.com/cssref/css_colors.asp`.
+  ///
+  /// Default to `#ffffff`, which is white.
   final String backgroundColorCssCode;
+
+  /// Placeholder (hint) for editor.
+  ///
+  /// Default to `Edit text`.
   final String placeholder;
+
+  /// Initial text for editor
   final String? initialText;
+
+  /// Whether to print webview console logs to debugger
+  ///
+  /// Default to `false`.
   final bool printWebViewLog;
 
+  /// Creates a [HtmlEditor].
+  ///
+  /// No paramameters are `required`. But if [autoAdjustScroll] is `true`,
+  /// then [controller.scrollController] must not be `null`.
   HtmlEditor({
     Key? key,
     controller,
@@ -39,6 +92,9 @@ class HtmlEditor extends StatefulWidget {
       this.controller = EditorController();
     } else {
       this.controller = controller;
+    }
+    if (autoAdjustScroll && flexibleHeight) {
+      assert(this.controller.scrollController != null);
     }
   }
 
@@ -302,7 +358,7 @@ class _HtmlEditorState extends State<HtmlEditor>
               widget.controller.setWebViewController(controller);
               _isInitializedCompleter.complete(true);
               if (widget.initialText != null) {
-                widget.controller.setText(widget.initialText!);
+                widget.controller.setHtml(widget.initialText!);
               }
             },
           ),
@@ -323,7 +379,7 @@ class _HtmlEditorState extends State<HtmlEditor>
     var heightChange = contentHeight - _height;
     if (heightChange != 0) {
       setState(() {
-        _height = max(contentHeight, 200);
+        _height = max(contentHeight, widget.minHeight);
       });
       if (widget.controller.scrollController != null &&
           widget.autoAdjustScroll) {

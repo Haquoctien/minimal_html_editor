@@ -60,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 icon: IconButton(
                   icon: Icon(Icons.pages),
                   onPressed: () async => print(
-                    await _editorController.getText(),
+                    await _editorController.getHtml(),
                   ),
                 ),
               ),
