@@ -1,10 +1,10 @@
 ## 0.0.1
 
-* TODO: Describe initial release.
+* Initial release.
 
 ## 0.0.2
 
-* TODO: Describe release.
+* Initial release.
 
 ## 0.0.3
 
@@ -15,7 +15,12 @@
 
 ## 0.0.3+1
 
-* Add README
-* Some refactoring
+* Add README.
+* Some refactoring.
 
 ## 1.0.0
+
+* First major version, please use this and upwards.
+  
+## 1.0.0+1
+* Adjust desciption to meet standards.
