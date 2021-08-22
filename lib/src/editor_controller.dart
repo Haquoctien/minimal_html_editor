@@ -2,6 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 class EditorController {
+  void Function(double height)? setHeight;
+
   /// Underlying web view controller.
   ///
   /// This will get initialized once the editor is fully loaded.
@@ -31,20 +33,22 @@ class EditorController {
     this.webViewController = controller;
   }
 
+  void setSetHeightCallback(void Function(double) f) {
+    this.setHeight = f;
+  }
+
   void focus() {
-    webViewController.evaluateJavascript(
-        source: 'document.getElementById("editor").focus();');
+    webViewController.evaluateJavascript(source: 'editor.focus();');
   }
 
   void unfocus() {
-    webViewController.evaluateJavascript(
-        source: 'document.getElementById("editor").blur();');
+    webViewController.evaluateJavascript(source: 'editor.blur();');
   }
 
   /// Get html content from editor
   Future<String> getHtml() async {
     return await webViewController.evaluateJavascript(
-        source: 'document.getElementById("editor").innerHTML;');
+        source: 'editor.innerHTML;');
   }
 
   /// Set html content for editor
@@ -53,6 +57,10 @@ class EditorController {
       await webViewController.evaluateJavascript(source: 'hidePlaceholder();');
     }
     await webViewController.evaluateJavascript(
-        source: 'document.getElementById("editor").innerHTML = `$html`;');
+        source: 'editor.innerHTML = `$html`;');
+    double contentHeight = double.parse((await webViewController
+            .evaluateJavascript(source: 'editor.scrollHeight;'))
+        .toString());
+    setHeight?.call(contentHeight);
   }
 }

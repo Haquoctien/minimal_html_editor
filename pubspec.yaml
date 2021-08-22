@@ -1,6 +1,6 @@
 name: minimal_html_editor
 description: Minimal html wysiwyg editor with only context menu formatting options, support flexible height, customize appearance, various text callbacks and methods.
-version: 1.0.0+2
+version: 1.1.0
 repository: https://github.com/Haquoctien/minimal_html_editor
 
 environment:

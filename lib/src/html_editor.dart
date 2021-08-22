@@ -224,6 +224,15 @@ class _HtmlEditorState extends State<HtmlEditor>
         },
       ),
     );
+    if (widget.flexibleHeight) {
+      widget.controller.setSetHeightCallback((height) {
+        if (mounted) {
+          this.setState(() {
+            _height = height;
+          });
+        }
+      });
+    }
     super.initState();
   }
 
