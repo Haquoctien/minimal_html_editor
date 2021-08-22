@@ -1,0 +1,46 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=yes">
+    <title>Din besked</title>
+</head>
+<style>
+    [contenteditable]:focus {
+        outline: 0px solid transparent;
+    }
+
+    body {
+        height: auto !important;
+        overflow: hidden !important;
+        background-color: #fafafa !important;
+        font-family: sans-serif;
+        margin: 0px;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-bottom: 10px;
+    }
+
+    #editor {
+        margin-top: -10px;
+        height: inherit;
+        overflow: inherit;
+        position: relative;
+        word-wrap: break-word
+    }
+
+    #placeholder {
+        position: absolute;
+        color: grey
+    }
+</style>
+
+<body id="body">
+    <div id="editor-container">
+        <div contenteditable="true" role="textbox" aria-multiline="true" spellcheck="false" autocorrect="false"
+            inputmode="text" id="editor">
+        </div>
+    </div>
+</body>
+
+</html>
