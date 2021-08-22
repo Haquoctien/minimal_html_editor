@@ -30,45 +30,111 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final _scrollController = ScrollController();
+  late EditorController _editorController;
+  @override
+  void initState() {
+    _editorController = EditorController(scrollController: _scrollController);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Scaffold(
-        appBar: AppBar(
-          title: Text("Minimal Html Editor demo"),
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          items: [
-            BottomNavigationBarItem(
-              label: "One",
-              icon: Icon(Icons.ac_unit),
+    return DefaultTabController(
+      initialIndex: 0,
+      length: 2,
+      child: Scaffold(
+        body: Scaffold(
+          appBar: AppBar(
+            title: Text("Minimal Html Editor demo"),
+            bottom: TabBar(
+              tabs: [
+                Text("Flexible"),
+                Text("Fixed and scrollable"),
+              ],
             ),
-            BottomNavigationBarItem(
-              label: "Two",
-              icon: Icon(Icons.access_alarm),
-            )
-          ],
-        ),
-        body: Center(
-          child: ListView(
-            controller: _scrollController,
-            children: <Widget>[
-              Center(
-                  child: Text(
-                "Hello world",
-                style: TextStyle(fontSize: 20),
-              )),
-              HtmlEditor(
-                flexibleHeight: true,
-                minHeight: 150,
-                autoAdjustScroll: true,
-                scrollController: _scrollController,
+          ),
+          bottomNavigationBar: BottomNavigationBar(
+            items: [
+              BottomNavigationBarItem(
+                label: "Log content ",
+                icon: IconButton(
+                  icon: Icon(Icons.pages),
+                  onPressed: () async => print(
+                    await _editorController.getText(),
+                  ),
+                ),
               ),
-              Center(
-                  child: Text(
-                "Chào thế giới",
-                style: TextStyle(fontSize: 20),
-              )),
+              BottomNavigationBarItem(
+                label: "Focus",
+                icon: IconButton(
+                  icon: Icon(Icons.edit_attributes_sharp),
+                  onPressed: () => _editorController.focus(),
+                ),
+              ),
+              BottomNavigationBarItem(
+                label: "Blur",
+                icon: IconButton(
+                  icon: Icon(Icons.edit_attributes_sharp),
+                  onPressed: () => _editorController.unfocus(),
+                ),
+              ),
+            ],
+          ),
+          body: TabBarView(
+            children: [
+              ListView(
+                controller: _scrollController,
+                children: <Widget>[
+                  Center(
+                    child: Text(
+                      "Hello world",
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ),
+                  HtmlEditor(
+                    flexibleHeight: true,
+                    autoAdjustScroll: true,
+                    controller: _editorController,
+                    minHeight: 150,
+                    backgroundColorCssCode: "magenta",
+                    placeholder: "Placeholder for flexible height",
+                    printWebViewLog: true,
+                  ),
+                  Center(
+                    child: Text(
+                      "Chào thế giới",
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ),
+                ],
+              ),
+              SingleChildScrollView(
+                child: Column(
+                  children: <Widget>[
+                    Center(
+                      child: Text(
+                        "Hello world",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ),
+                    HtmlEditor(
+                      backgroundColorCssCode: "#fafafa",
+                      minHeight: 250,
+                      initialText: r"""<p>I am normal</p>
+                      <p style="color:red;">I am red</p>
+                      <p style="color:blue;">I am blue</p>
+                      <p style="font-size:50px;">I am big</p>""",
+                      placeholder: "Placeholder for fixed height",
+                    ),
+                    Center(
+                      child: Text(
+                        "Chào thế giới",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
