@@ -24,3 +24,6 @@
   
 ## 1.0.0+1
 * Adjust desciption to meet standards.
+
+## 1.0.0+2
+* Edit README.
