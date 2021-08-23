@@ -43,3 +43,7 @@
 ## 1.1.2
 * Add text scale option
 * Add custom webview options
+
+## 1.1.2+1
+* Remove done action button
+* Simplify html layout

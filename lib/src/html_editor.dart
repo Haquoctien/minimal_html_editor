@@ -157,7 +157,7 @@ class HtmlEditorState extends State<HtmlEditor>
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=${widget.scaleFactor}">
+    <meta name="viewport" content="width=device-width, initial-scale=1}">
     <title>${widget.webViewTitle}</title>
 </head>
 <style>
@@ -192,11 +192,9 @@ class HtmlEditorState extends State<HtmlEditor>
     }
 </style>
 <body id="body">
-    <div id="editor-container">
-        <div contenteditable="true" role="textbox" aria-multiline="true" spellcheck="false" autocorrect="false"
-            inputmode="text" id="editor" enterkeyhint="done">
-        </div>
-    </div>
+  <div contenteditable="true" role="textbox" aria-multiline="true" spellcheck="false" autocorrect="false"
+      inputmode="text" id="editor">
+  </div>
 </body>
 
 </html>
@@ -281,21 +279,23 @@ class HtmlEditorState extends State<HtmlEditor>
     return InAppWebView(
       initialOptions: widget.webViewOptions ??
           InAppWebViewGroupOptions(
-              crossPlatform: InAppWebViewOptions(
-                javaScriptEnabled: true,
-                transparentBackground: true,
-                disableHorizontalScroll: true,
-                disableVerticalScroll: widget.flexibleHeight,
-                horizontalScrollBarEnabled: false,
-                verticalScrollBarEnabled: !widget.flexibleHeight,
-                supportZoom: false,
-              ),
-              android: AndroidInAppWebViewOptions(
-                geolocationEnabled: false,
-                builtInZoomControls: false,
-                thirdPartyCookiesEnabled: false,
-                useHybridComposition: widget.useAndroidHybridComposition,
-              )),
+            crossPlatform: InAppWebViewOptions(
+              javaScriptEnabled: true,
+              transparentBackground: true,
+              disableHorizontalScroll: true,
+              disableVerticalScroll: widget.flexibleHeight,
+              horizontalScrollBarEnabled: false,
+              verticalScrollBarEnabled: !widget.flexibleHeight,
+              //supportZoom: false,
+            ),
+            android: AndroidInAppWebViewOptions(
+              geolocationEnabled: false,
+              builtInZoomControls: false,
+              thirdPartyCookiesEnabled: false,
+              textZoom: (100 * widget.scaleFactor).toInt(),
+              useHybridComposition: widget.useAndroidHybridComposition,
+            ),
+          ),
       contextMenu: _contextMenu,
       onConsoleMessage: widget.printWebViewLog
           ? (_, message) {
@@ -371,7 +371,7 @@ class HtmlEditorState extends State<HtmlEditor>
             }, false);
     
             function showPlaceholder() {
-              document.getElementById("editor-container").prepend(placeholder);
+              document.getElementById("body").prepend(placeholder);
             }
             function hidePlaceholder() {
               placeholder.remove();
