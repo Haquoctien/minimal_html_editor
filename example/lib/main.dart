@@ -73,6 +73,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       placeholder: "Chào thế giới",
                       printWebViewLog: true,
                       useAndroidHybridComposition: true,
+                      showLoadingWheel: true,
+                      scaleFactor: 2,
                       onChange: (content, height) => print(content),
                     ),
                     Center(

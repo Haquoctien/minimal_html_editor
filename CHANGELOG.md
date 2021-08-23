@@ -39,3 +39,7 @@
 * Make HtmlEditorState public
 * Take padding into account for height adjustment
 * Make loading wheel otional
+
+## 1.1.2
+* Add text scale option
+* Add custom webview options

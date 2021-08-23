@@ -7,7 +7,6 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:minimal_html_editor/src/editor_controller.dart';
 
 // ignore: must_be_immutable
-
 class HtmlEditor extends StatefulWidget {
   /// Controller for controlling underlying webview and parent's scroll controller.
   ///
@@ -90,15 +89,23 @@ class HtmlEditor extends StatefulWidget {
   /// Default to `false`.
   final bool useAndroidHybridComposition;
 
-  /// Creates a [HtmlEditor].
-  ///
-  /// No paramameters are `required`. But if [autoAdjustScroll] is `true`,
-  /// then [EditorController.scrollController] must not be `null`.
-
   /// Whether to stack a loading wheel on top while the editor is being loaded.
   ///
   /// Default to `false`.
   final bool showLoadingWheel;
+
+  /// Content scale factor for this web view
+  ///
+  /// Default to `1.0`
+  final double scaleFactor;
+
+  /// Custom webview options
+  final InAppWebViewGroupOptions? webViewOptions;
+
+  /// Creates a [HtmlEditor].
+  ///
+  /// No paramameters are `required`. But if [autoAdjustScroll] is `true`,
+  /// then [EditorController.scrollController] must not be `null`.
   HtmlEditor({
     Key? key,
     EditorController? controller,
@@ -116,6 +123,8 @@ class HtmlEditor extends StatefulWidget {
     this.webViewTitle = "Editor",
     this.useAndroidHybridComposition = false,
     this.showLoadingWheel = false,
+    this.scaleFactor = 1.0,
+    this.webViewOptions,
   }) : super(key: key) {
     if (controller == null) {
       this.controller = EditorController();
@@ -148,7 +157,7 @@ class HtmlEditorState extends State<HtmlEditor>
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=${widget.scaleFactor}">
     <title>${widget.webViewTitle}</title>
 </head>
 <style>
@@ -270,22 +279,23 @@ class HtmlEditorState extends State<HtmlEditor>
 
   Widget buildWebView() {
     return InAppWebView(
-      initialOptions: InAppWebViewGroupOptions(
-          crossPlatform: InAppWebViewOptions(
-            javaScriptEnabled: true,
-            transparentBackground: true,
-            disableHorizontalScroll: true,
-            disableVerticalScroll: widget.flexibleHeight,
-            horizontalScrollBarEnabled: false,
-            verticalScrollBarEnabled: !widget.flexibleHeight,
-            supportZoom: false,
-          ),
-          android: AndroidInAppWebViewOptions(
-            geolocationEnabled: false,
-            builtInZoomControls: false,
-            thirdPartyCookiesEnabled: false,
-            useHybridComposition: widget.useAndroidHybridComposition,
-          )),
+      initialOptions: widget.webViewOptions ??
+          InAppWebViewGroupOptions(
+              crossPlatform: InAppWebViewOptions(
+                javaScriptEnabled: true,
+                transparentBackground: true,
+                disableHorizontalScroll: true,
+                disableVerticalScroll: widget.flexibleHeight,
+                horizontalScrollBarEnabled: false,
+                verticalScrollBarEnabled: !widget.flexibleHeight,
+                supportZoom: false,
+              ),
+              android: AndroidInAppWebViewOptions(
+                geolocationEnabled: false,
+                builtInZoomControls: false,
+                thirdPartyCookiesEnabled: false,
+                useHybridComposition: widget.useAndroidHybridComposition,
+              )),
       contextMenu: _contextMenu,
       onConsoleMessage: widget.printWebViewLog
           ? (_, message) {

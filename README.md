@@ -2,10 +2,10 @@
 [Minimal HTML WYSIWYG editor](https://pub.dev/packages/minimal_html_editor) with **only context menu formatting options** (for now).
 
 This is mainly an alternative to other html-based WYSIWYG editors that:
- - use Summernote under the hood and very bloated
- - doesn't work well with screen reader
- - and doesn't offer fine-grained UI customization
- - lacking common text field callbacks and methods
+ - use Summernote under the hood and are very bloated
+ - don't work well with screen reader
+ - don't offer fine-grained UI customization
+ - lack common text field callbacks and methods
 # Features
 ### *Support fine-grained UI customization:*
 - fixed height or flexible height
@@ -14,7 +14,8 @@ This is mainly an alternative to other html-based WYSIWYG editors that:
 - padding
 - Android hybrid composition
 - Webview title (for screen reader)
-- Auto-adjust scrolling for editor's height change
+- auto-adjust scrolling for editor's height change
+- text scaling
 ### *Common text field callbacks:*
 - on focus
 - on blur
@@ -68,6 +69,9 @@ ListView(
       ),
       initialText: "Some initial text",
       placeholder: "Edit me",
+      padding: EdgeInsets.all(10),
+      scaleFactor: 1.5,
+      showLoadingWheel: true,
       onChange: (content, height) => update(content),
       onFocus: () => doSomething(),
       onBlur: () => doSomeOtherThing(),
