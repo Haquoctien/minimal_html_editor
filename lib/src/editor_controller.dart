@@ -56,6 +56,9 @@ class EditorController {
     if (html != '<p></p>' && html != '<p><br></p>') {
       await webViewController.evaluateJavascript(source: 'hidePlaceholder();');
     }
+    if (html == '<p></p>') {
+      html = '<p><br></p>';
+    }
     await webViewController.evaluateJavascript(
         source: 'editor.innerHTML = `$html`;');
     double contentHeight = double.parse((await webViewController

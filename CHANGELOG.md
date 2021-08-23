@@ -34,3 +34,8 @@
 ## 1.1.1
 * Edit README
 * Add custom padding and make useAndroidHybridComposition optional
+
+## 1.1.1+1
+* Make HtmlEditorState public
+* Take padding into account for height adjustment
+* Make loading wheel otional

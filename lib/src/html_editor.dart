@@ -94,6 +94,11 @@ class HtmlEditor extends StatefulWidget {
   ///
   /// No paramameters are `required`. But if [autoAdjustScroll] is `true`,
   /// then [EditorController.scrollController] must not be `null`.
+
+  /// Whether to stack a loading wheel on top while the editor is being loaded.
+  ///
+  /// Default to `false`.
+  final bool showLoadingWheel;
   HtmlEditor({
     Key? key,
     EditorController? controller,
@@ -110,6 +115,7 @@ class HtmlEditor extends StatefulWidget {
     this.printWebViewLog = false,
     this.webViewTitle = "Editor",
     this.useAndroidHybridComposition = false,
+    this.showLoadingWheel = false,
   }) : super(key: key) {
     if (controller == null) {
       this.controller = EditorController();
@@ -122,10 +128,10 @@ class HtmlEditor extends StatefulWidget {
   }
 
   @override
-  _HtmlEditorState createState() => _HtmlEditorState();
+  HtmlEditorState createState() => HtmlEditorState();
 }
 
-class _HtmlEditorState extends State<HtmlEditor>
+class HtmlEditorState extends State<HtmlEditor>
     with AutomaticKeepAliveClientMixin {
   late String htmlData;
   late double _height;
@@ -179,7 +185,7 @@ class _HtmlEditorState extends State<HtmlEditor>
 <body id="body">
     <div id="editor-container">
         <div contenteditable="true" role="textbox" aria-multiline="true" spellcheck="false" autocorrect="false"
-            inputmode="text" id="editor">
+            inputmode="text" id="editor" enterkeyhint="done">
         </div>
     </div>
 </body>
@@ -245,7 +251,7 @@ class _HtmlEditorState extends State<HtmlEditor>
       widget.controller.setSetHeightCallback((height) {
         if (mounted) {
           this.setState(() {
-            _height = height;
+            _height = max(height, widget.minHeight);
           });
         }
       });
@@ -257,55 +263,54 @@ class _HtmlEditorState extends State<HtmlEditor>
   Widget build(BuildContext context) {
     super.build(context);
     return Container(
-      height: _height,
-      child: Stack(
-        children: [
-          InAppWebView(
-            initialOptions: InAppWebViewGroupOptions(
-                crossPlatform: InAppWebViewOptions(
-                  javaScriptEnabled: true,
-                  transparentBackground: true,
-                  disableHorizontalScroll: true,
-                  disableVerticalScroll: widget.flexibleHeight,
-                  horizontalScrollBarEnabled: false,
-                  verticalScrollBarEnabled: !widget.flexibleHeight,
-                  supportZoom: false,
-                ),
-                ios: IOSInAppWebViewOptions(
-                  disallowOverScroll: true,
-                  scrollsToTop: false,
-                  allowsBackForwardNavigationGestures: false,
-                ),
-                android: AndroidInAppWebViewOptions(
-                  geolocationEnabled: false,
-                  builtInZoomControls: false,
-                  thirdPartyCookiesEnabled: false,
-                  useHybridComposition: widget.useAndroidHybridComposition,
-                )),
-            contextMenu: _contextMenu,
-            onConsoleMessage: widget.printWebViewLog
-                ? (_, message) {
-                    print("Webview: " + message.message);
-                  }
-                : null,
-            initialData: InAppWebViewInitialData(
-              data: htmlData,
-            ),
-            onWebViewCreated: (controller) {
-              _controller = controller;
-            },
-            onLoadError: (_, __, ___, ____) {
-              _isInitializedCompleter.complete(false);
-            },
-            onLoadStop: (controller, _) {
-              // set up editor and add callbacks
-              controller.evaluateJavascript(source: """
+      height: _height + widget.padding.top + widget.padding.bottom,
+      child: widget.showLoadingWheel ? buildStack() : buildWebView(),
+    );
+  }
+
+  Widget buildWebView() {
+    return InAppWebView(
+      initialOptions: InAppWebViewGroupOptions(
+          crossPlatform: InAppWebViewOptions(
+            javaScriptEnabled: true,
+            transparentBackground: true,
+            disableHorizontalScroll: true,
+            disableVerticalScroll: widget.flexibleHeight,
+            horizontalScrollBarEnabled: false,
+            verticalScrollBarEnabled: !widget.flexibleHeight,
+            supportZoom: false,
+          ),
+          android: AndroidInAppWebViewOptions(
+            geolocationEnabled: false,
+            builtInZoomControls: false,
+            thirdPartyCookiesEnabled: false,
+            useHybridComposition: widget.useAndroidHybridComposition,
+          )),
+      contextMenu: _contextMenu,
+      onConsoleMessage: widget.printWebViewLog
+          ? (_, message) {
+              print("Webview: " + message.message);
+            }
+          : null,
+      initialData: InAppWebViewInitialData(
+        data: htmlData,
+      ),
+      onWebViewCreated: (controller) {
+        _controller = controller;
+      },
+      onLoadError: (_, __, ___, ____) {
+        _isInitializedCompleter.complete(false);
+      },
+      onLoadStop: (controller, _) {
+        // set up editor and add callbacks
+        controller.evaluateJavascript(source: """
             // initialize 
             var editor = document.getElementById("editor");
             editor.innerHTML = "<p><br></p>";
             var placeholder = document.createElement("div");
             placeholder.innerHTML = "<p>${widget.placeholder}</p>";
             placeholder.id = "placeholder";
+            var body = document.getElementById("body");
             showPlaceholder();
             // block delete input to keep default content
             editor.addEventListener("keydown", event => {
@@ -354,7 +359,7 @@ class _HtmlEditorState extends State<HtmlEditor>
                 console.log("Flexible height:" + height);
                 window.flutter_inappwebview.callHandler("onChange", content, height);
             }, false);
-
+    
             function showPlaceholder() {
               document.getElementById("editor-container").prepend(placeholder);
             }
@@ -362,48 +367,53 @@ class _HtmlEditorState extends State<HtmlEditor>
               placeholder.remove();
             }
             """);
-              // add handlers
-              controller.addJavaScriptHandler(
-                  handlerName: 'onFocus',
-                  callback: (_) {
-                    if (Platform.isIOS) {
-                      setState(() {
-                        _height += Random().nextBool() ? 0.5 : -0.5;
-                      });
-                    }
-                    widget.onFocus?.call();
-                  });
-              controller.addJavaScriptHandler(
-                  handlerName: 'onBlur',
-                  callback: (_) {
-                    widget.onBlur?.call();
-                  });
-              controller.addJavaScriptHandler(
-                  handlerName: 'onChange',
-                  callback: (args) {
-                    String content = args[0];
-                    int height = args[1];
-                    if (widget.flexibleHeight) {
-                      adjustEditorHeight(contentHeight: height.toDouble());
-                    }
-                    widget.onChange?.call(content, height.toDouble());
-                  });
-              _controller = controller;
-              widget.controller.setWebViewController(controller);
-              _isInitializedCompleter.complete(true);
-              if (widget.initialText != null) {
-                widget.controller.setHtml('<p>${widget.initialText!}</p>');
+        // add handlers
+        controller.addJavaScriptHandler(
+            handlerName: 'onFocus',
+            callback: (_) {
+              if (Platform.isIOS) {
+                setState(() {
+                  _height += Random().nextBool() ? 0.5 : -0.5;
+                });
               }
-            },
-          ),
-          if (_showLoadingWheel)
-            Center(
-              child: CircularProgressIndicator(
-                color: Colors.blue,
-              ),
-            )
-        ],
-      ),
+              widget.onFocus?.call();
+            });
+        controller.addJavaScriptHandler(
+            handlerName: 'onBlur',
+            callback: (_) {
+              widget.onBlur?.call();
+            });
+        controller.addJavaScriptHandler(
+            handlerName: 'onChange',
+            callback: (args) {
+              String content = args[0];
+              int height = args[1];
+              if (widget.flexibleHeight) {
+                adjustEditorHeight(contentHeight: height.toDouble());
+              }
+              widget.onChange?.call(content, height.toDouble());
+            });
+        _controller = controller;
+        widget.controller.setWebViewController(controller);
+        _isInitializedCompleter.complete(true);
+        if (widget.initialText != null) {
+          widget.controller.setHtml('<p>${widget.initialText!}</p>');
+        }
+      },
+    );
+  }
+
+  Widget buildStack() {
+    return Stack(
+      children: [
+        buildWebView(),
+        if (_showLoadingWheel)
+          Center(
+            child: CircularProgressIndicator(
+              color: Colors.blue,
+            ),
+          )
+      ],
     );
   }
 
@@ -419,10 +429,8 @@ class _HtmlEditorState extends State<HtmlEditor>
           widget.autoAdjustScroll) {
         ScrollController controller = widget.controller.scrollController!;
         if (controller.position.maxScrollExtent > 0) {
-          WidgetsBinding.instance?.addPostFrameCallback((_) {
-            controller.animateTo(controller.offset + heightChange,
-                duration: Duration(milliseconds: 200), curve: Curves.ease);
-          });
+          controller.animateTo(controller.offset + heightChange,
+              duration: Duration(milliseconds: 200), curve: Curves.ease);
         }
       }
     }
